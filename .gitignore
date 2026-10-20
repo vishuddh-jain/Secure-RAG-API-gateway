@@ -1,2 +1,8 @@
 # Python venv
 venv/
+
+# Cache Files
+__pycache__/
+
+# Environment 
+.env

@@ -1,4 +1,6 @@
 from fastapi import APIRouter, UploadFile, File, Form
+from core.document_loader import process_and_chunk_pdf
+from core.vector_store import add_to_vector_store
 
 # Initialize the router
 router = APIRouter()
@@ -9,14 +11,19 @@ async def upload_document(
     security_level: str = Form(..., description="Must be 'public' or 'confidential'")
 ):
     """
-    Ingestion Endpoint: Uploads a PDF and categorizes its sensitivity.
+    Ingestion Endpoint: Uploads a PDF, chunks it, and saves to Vector DB.
     """
-    # TODO: Add Langchain parsing, chunking, and ChromaDB logic here later
+    # 1. Process and chunk the PDF, injecting the security level metadata
+    chunks = await process_and_chunk_pdf(file, security_level)
+    
+    # 2. Save the embedded chunks to ChromaDB
+    add_to_vector_store(chunks)
     
     return {
         "filename": file.filename,
         "security_level": security_level,
-        "message": "File received successfully! (AI processing coming soon)"
+        "chunks_saved": len(chunks),
+        "message": "File successfully ingested and embedded into ChromaDB!"
     }
 
 @router.get("/query")
