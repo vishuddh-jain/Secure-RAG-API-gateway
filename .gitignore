@@ -6,3 +6,9 @@ __pycache__/
 
 # Environment 
 .env
+
+# Local Database
+chroma_db/
+
+# Deploy
+Ngrok/
