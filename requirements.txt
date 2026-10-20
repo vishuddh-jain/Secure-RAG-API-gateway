@@ -3,5 +3,6 @@ uvicorn
 langchain
 langchain-community
 langchain-chroma
+langchain-ollama
 pypdf
 python-dotenv

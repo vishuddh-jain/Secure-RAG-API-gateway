@@ -26,14 +26,19 @@ async def upload_document(
         "message": "File successfully ingested and embedded into ChromaDB!"
     }
 
+
+from core.rag_chain import process_query
+   
 @router.get("/query")
 async def query_document(question: str):
     """
     Query Endpoint: Ask questions against the uploaded documents.
     """
-    # TODO: Add Langchain retrieval and Ollama/Cloud LLM routing logic here later
+    result = process_query(question)
     
     return {
         "question": question,
-        "answer": "This is a mock answer. The RAG pipeline and Hybrid LLM Router are not connected yet!"
+        "answer": result["answer"],
+        "security_routed_locally": result["routed_to_local"],
+        "sources_used": result.get("sources", [])
     }

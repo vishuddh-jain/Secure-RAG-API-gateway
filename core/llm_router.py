@@ -1,4 +1,4 @@
-from langchain_community.chat_models import ChatOllama
+from langchain_ollama import ChatOllama
 # from langchain_groq import ChatGroq # (You can uncomment this later when you have an API key)
 
 def get_llm(is_confidential: bool):
