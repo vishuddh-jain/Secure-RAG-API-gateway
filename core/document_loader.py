@@ -3,7 +3,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 import tempfile
 import os
 
-async def process_and_chunk_pdf(upload_file, security_level):
+async def process_and_chunk_pdf(upload_file, security_level, user_id):
     """
     Takes a FastAPI UploadFile, reads it, adds the security tag, 
     and splits it into smaller chunks for the Vector DB.
@@ -31,6 +31,7 @@ async def process_and_chunk_pdf(upload_file, security_level):
     # 3. Add the security clearance metadata to every page
     for doc in documents:
         doc.metadata["security_level"] = security_level
+        doc.metadata["user_id"] = user_id
 
     # 4. Split the text into smaller chunks (RAG best practice)
     text_splitter = RecursiveCharacterTextSplitter(

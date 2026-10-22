@@ -1,4 +1,5 @@
 import os
+import shutil
 from langchain_chroma import Chroma
 from langchain_community.embeddings import OllamaEmbeddings
 
@@ -35,3 +36,14 @@ def add_to_vector_store(chunks):
     # This automatically embeds the text and saves it to the local folder
     db.add_documents(chunks)
     print(f"Saved {len(chunks)} chunks to {CHROMA_PATH}.")
+    
+# deleting local database folder if admin wants to, after user uses API 
+def reset_vector_store():
+    """
+    Deletes the ChromaDB directory to wipe all saved documents.
+    """
+    if os.path.exists(CHROMA_PATH):
+        shutil.rmtree(CHROMA_PATH)
+        print(f"🚨 Database at {CHROMA_PATH} has been completely wiped.")
+        return True
+    return False
