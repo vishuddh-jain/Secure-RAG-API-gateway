@@ -7,3 +7,4 @@ langchain-ollama
 langchain-groq
 pypdf
 python-dotenv
+docx2txt

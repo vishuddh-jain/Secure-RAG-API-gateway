@@ -1,4 +1,4 @@
-from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.document_loaders import PyPDFLoader, Docx2txtLoader, TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 import tempfile
 import os
@@ -9,13 +9,23 @@ async def process_and_chunk_pdf(upload_file, security_level):
     and splits it into smaller chunks for the Vector DB.
     """
     # 1. Create a temporary file to save the uploaded PDF
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+    
+    file_extension = os.path.splitext(upload_file.filename)[1].lower()
+    with tempfile.NamedTemporaryFile(delete=False, suffix=file_extension) as tmp:
         content = await upload_file.read()
         tmp.write(content)
         tmp_path = tmp.name
 
     # 2. Load the PDF using Langchain
-    loader = PyPDFLoader(tmp_path)
+    if file_extension == ".pdf":
+        loader = PyPDFLoader(tmp_path)
+    elif file_extension == ".docx":
+        loader = Docx2txtLoader(tmp_path)
+    elif file_extension == ".txt":
+        loader = TextLoader(tmp_path)
+    else:
+        os.remove(tmp_path)
+        raise ValueError(f"Unsupported file format: {file_extension}. Please upload a PDF, DOCX, or TXT file.")
     documents = loader.load()
 
     # 3. Add the security clearance metadata to every page

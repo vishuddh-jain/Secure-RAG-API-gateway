@@ -1,14 +1,20 @@
-from fastapi import APIRouter, UploadFile, File, Form
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from core.document_loader import process_and_chunk_pdf
 from core.vector_store import add_to_vector_store
 
 # Initialize the router
 router = APIRouter()
 
+from enum import Enum
+
+class SecurityLevel(str, Enum):
+    public = "public"
+    confidential = "confidential"
+    
 @router.post("/upload")
 async def upload_document(
     file: UploadFile = File(...), 
-    security_level: str = Form(..., description="Must be 'public' or 'confidential'")
+    security_level: SecurityLevel = Form(..., description="Must be 'public' or 'confidential'")
 ):
     """
     Ingestion Endpoint: Uploads a PDF, chunks it, and saves to Vector DB.
@@ -18,6 +24,12 @@ async def upload_document(
     
     # 2. Save the embedded chunks to ChromaDB
     add_to_vector_store(chunks)
+    
+    if security_level not in ["public", "confidential"]:
+        raise HTTPException(
+            status_code=400,
+            detail="security_level must be 'public' or 'confidential'"
+        )
     
     return {
         "filename": file.filename,
