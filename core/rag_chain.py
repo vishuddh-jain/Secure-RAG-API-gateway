@@ -6,7 +6,7 @@ def process_query(question: str, user_id: str):
     db = get_vector_store()
     
     # 1. Retrieve the top 3 most relevant chunks from ChromaDB
-    docs = db.similarity_search(question, k=3, filter={"user_id" : user_id})
+    docs = db.similarity_search(question, k=5, filter={"user_id" : user_id})
     
     if not docs:
         return {"answer": "I don't have any uploaded documents that answer this.", "routed_to_local": False}
