@@ -28,7 +28,7 @@ async def process_and_chunk_pdf(upload_file, security_level, user_id):
         raise ValueError(f"Unsupported file format: {file_extension}. Please upload a PDF, DOCX, or TXT file.")
     documents = loader.load()
 
-    # 3. Add the security clearance metadata to every page
+    # 3. Add the security clearance and user_id metadata to every page
     for doc in documents:
         doc.metadata["security_level"] = security_level
         doc.metadata["user_id"] = user_id
@@ -39,6 +39,7 @@ async def process_and_chunk_pdf(upload_file, security_level, user_id):
         chunk_overlap=200,
         length_function=len
     )
+    
     chunks = text_splitter.split_documents(documents)
 
     # 5. Clean up the temporary file
