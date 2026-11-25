@@ -1,3 +1,59 @@
+
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
+import uvicorn
+
+from api.routes import router as api_router
+from core.vector_store import (
+    get_embedding_model,
+    get_vector_store
+)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+
+    print("Initializing Secure RAG resources...")
+
+    # Initialize resources once at startup
+    app.state.embedding_model = get_embedding_model()
+    app.state.vector_store = get_vector_store()
+
+    print("Embedding model wrapper and ChromaDB initialized.")
+
+    yield
+
+    print("Shutting down Secure RAG API Gateway...")
+
+
+app = FastAPI(
+    title="Secure-RAG API Gateway",
+    description="Hybrid-Cloud Document Intelligence API",
+    version="1.0.0",
+    lifespan=lifespan
+)
+
+app.include_router(api_router)
+
+
+@app.get("/")
+async def root():
+    return {
+        "message": "Welcome to the Secure-RAG API Gateway!"
+    }
+
+
+if __name__ == "__main__":
+    uvicorn.run(
+        "main:app",
+        host="127.0.0.1",
+        port=8000,
+        reload=True
+    )
+
+
+"""
 from fastapi import FastAPI
 import uvicorn
 from api.routes import router as api_router  # IMPORT YOUR NEW ROUTER
@@ -19,3 +75,4 @@ async def root():
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+"""
